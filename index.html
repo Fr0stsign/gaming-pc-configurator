@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gaming PC Configurator</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #181c22; color: #f5f5f7; margin: 0; padding: 0; }
+    .container { max-width: 700px; margin: 30px auto; background: #23272e; border-radius: 8px; padding: 32px 24px; box-shadow: 0 0 16px #0004; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    label { display: block; margin: 18px 0 6px; }
+    input, select { font-size: 1em; padding: 6px; border-radius: 4px; border: 1px solid #333; margin-bottom: 10px; background: #282c34; color: #f5f5f7;}
+    .brand-prefs { display: flex; flex-wrap: wrap; gap: 12px; }
+    .brand-group { flex: 1 1 210px; min-width: 180px; }
+    button { background: #3584e4; color: #fff; border: none; padding: 10px 22px; border-radius: 5px; font-size: 1em; margin-top: 24px; cursor: pointer; }
+    button:hover { background: #1e66d4; }
+    .result { margin-top: 40px; background: #181d23; border-radius: 8px; padding: 24px; }
+    .parts-list { margin: 0; padding: 0; list-style: none; }
+    .parts-list li { padding: 8px 0; border-bottom: 1px solid #2227; }
+    .fps-table { width: 100%; margin-top: 12px; border-collapse: collapse; }
+    .fps-table th, .fps-table td { border: 1px solid #333; padding: 6px 10px; }
+    .fps-table th { background: #222; }
+    .note { color: #aaa; font-size: 0.98em; margin-top: 18px; }
+    @media (max-width: 600px) {
+      .container { padding: 10px; }
+      .brand-prefs { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gaming PC Configurator</h1>
+    <form id="configForm">
+      <label for="budget">Your budget (USD):</label>
+      <input type="number" id="budget" min="400" max="4000" value="1200" required />
+
+      <div class="brand-prefs">
+        <div class="brand-group">
+          <label>CPU Brand:</label>
+          <select id="cpuBrand">
+            <option value="">No Preference</option>
+            <option value="AMD">AMD</option>
+            <option value="Intel">Intel</option>
+          </select>
+        </div>
+        <div class="brand-group">
+          <label>GPU Brand:</label>
+          <select id="gpuBrand">
+            <option value="">No Preference</option>
+            <option value="NVIDIA">NVIDIA</option>
+            <option value="AMD">AMD</option>
+          </select>
+        </div>
+        <div class="brand-group">
+          <label>Motherboard Brand:</label>
+          <select id="moboBrand">
+            <option value="">No Preference</option>
+            <option value="ASUS">ASUS</option>
+            <option value="MSI">MSI</option>
+            <option value="Gigabyte">Gigabyte</option>
+            <option value="ASRock">ASRock</option>
+          </select>
+        </div>
+        <div class="brand-group">
+          <label>RAM Brand:</label>
+          <select id="ramBrand">
+            <option value="">No Preference</option>
+            <option value="Corsair">Corsair</option>
+            <option value="G.Skill">G.Skill</option>
+            <option value="Kingston">Kingston</option>
+            <option value="Crucial">Crucial</option>
+          </select>
+        </div>
+        <div class="brand-group">
+          <label>Storage Brand:</label>
+          <select id="storageBrand">
+            <option value="">No Preference</option>
+            <option value="Samsung">Samsung</option>
+            <option value="Western Digital">Western Digital</option>
+            <option value="Crucial">Crucial</option>
+            <option value="Seagate">Seagate</option>
+          </select>
+        </div>
+        <div class="brand-group">
+          <label>PSU Brand:</label>
+          <select id="psuBrand">
+            <option value="">No Preference</option>
+            <option value="Corsair">Corsair</option>
+            <option value="Seasonic">Seasonic</option>
+            <option value="EVGA">EVGA</option>
+            <option value="be quiet!">be quiet!</option>
+          </select>
+        </div>
+        <div class="brand-group">
+          <label>Case Brand:</label>
+          <select id="caseBrand">
+            <option value="">No Preference</option>
+            <option value="NZXT">NZXT</option>
+            <option value="Fractal Design">Fractal Design</option>
+            <option value="Corsair">Corsair</option>
+            <option value="Cooler Master">Cooler Master</option>
+          </select>
+        </div>
+        <div class="brand-group">
+          <label>Cooler Type:</label>
+          <select id="coolerType">
+            <option value="Air">Air Cooler</option>
+            <option value="AIO">AIO Liquid Cooler</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit">Configure My PC!</button>
+    </form>
+    <div id="result" class="result" style="display:none"></div>
+    <div class="note">All prices and FPS are approximate and for demonstration only. <br>
+    <b>This app works entirely in your browser. No data is sent anywhere.</b></div>
+  </div>
+  <script>
+    // Demo parts database (expand as needed)
+    const partsDB = {
+      cpus: [
+        {brand: "AMD", model: "Ryzen 5 5600", price: 140, tier: 2, performance: { "Cyberpunk 2077": 75, "Fortnite": 180, "GTA V": 120 }},
+        {brand: "AMD", model: "Ryzen 7 5800X3D", price: 300, tier: 4, performance: { "Cyberpunk 2077": 110, "Fortnite": 250, "GTA V": 180 }},
+        {brand: "Intel", model: "Core i5-12400F", price: 150, tier: 2, performance: { "Cyberpunk 2077": 78, "Fortnite": 172, "GTA V": 122 }},
+        {brand: "Intel", model: "Core i5-13600K", price: 310, tier: 4, performance: { "Cyberpunk 2077": 115, "Fortnite": 255, "GTA V": 185 }},
+      ],
+      gpus: [
+        {brand: "NVIDIA", model: "RTX 4060", price: 320, tier: 2, performance: { "Cyberpunk 2077": 75, "Fortnite": 200, "GTA V": 135 }},
+        {brand: "NVIDIA", model: "RTX 4070", price: 530, tier: 4, performance: { "Cyberpunk 2077": 120, "Fortnite": 310, "GTA V": 180 }},
+        {brand: "AMD", model: "RX 7600", price: 270, tier: 2, performance: { "Cyberpunk 2077": 68, "Fortnite": 198, "GTA V": 130 }},
+        {brand: "AMD", model: "RX 7800 XT", price: 480, tier: 4, performance: { "Cyberpunk 2077": 115, "Fortnite": 295, "GTA V": 175 }},
+      ],
+      motherboards: [
+        {brand: "ASUS", model: "TUF B550-PLUS", price: 130},
+        {brand: "MSI", model: "MAG B550 Tomahawk", price: 140},
+        {brand: "Gigabyte", model: "B660M DS3H", price: 110},
+        {brand: "ASRock", model: "B660 Pro RS", price: 120},
+      ],
+      ram: [
+        {brand: "Corsair", model: "Vengeance LPX 16GB 3200", price: 55},
+        {brand: "G.Skill", model: "Ripjaws V 16GB 3600", price: 58},
+        {brand: "Kingston", model: "FURY Beast 16GB 3200", price: 53},
+        {brand: "Crucial", model: "Ballistix 16GB 3200", price: 50},
+      ],
+      storages: [
+        {brand: "Samsung", model: "970 Evo 1TB NVMe SSD", price: 60},
+        {brand: "Western Digital", model: "SN570 1TB NVMe SSD", price: 58},
+        {brand: "Crucial", model: "P3 1TB NVMe SSD", price: 56},
+        {brand: "Seagate", model: "Barracuda 2TB HDD", price: 48},
+      ],
+      psus: [
+        {brand: "Corsair", model: "RM650x 650W 80+ Gold", price: 90},
+        {brand: "Seasonic", model: "S12III 650W 80+ Bronze", price: 75},
+        {brand: "EVGA", model: "SuperNOVA 650 G5 80+ Gold", price: 88},
+        {brand: "be quiet!", model: "Pure Power 11 600W", price: 80},
+      ],
+      cases: [
+        {brand: "NZXT", model: "H510", price: 70},
+        {brand: "Fractal Design", model: "Meshify C", price: 90},
+        {brand: "Corsair", model: "4000D", price: 90},
+        {brand: "Cooler Master", model: "NR600", price: 80},
+      ],
+      coolers: [
+        // Air
+        {brand: "be quiet!", model: "Pure Rock 2 (Air)", price: 40, type: "Air"},
+        {brand: "Cooler Master", model: "Hyper 212 (Air)", price: 35, type: "Air"},
+        // AIO
+        {brand: "Corsair", model: "H100i RGB (AIO)", price: 90, type: "AIO"},
+        {brand: "NZXT", model: "Kraken 120 (AIO)", price: 78, type: "AIO"}
+      ]
+    };
+
+    // Helper: Pick best part for price/preference
+    function pickPart(list, brand, maxPrice, type) {
+      let filtered = list.filter(p => (!brand || p.brand === brand) && (!type || p.type === type) && (!maxPrice || p.price <= maxPrice));
+      // pick highest price <= maxPrice
+      filtered = filtered.sort((a, b) => b.price - a.price);
+      return filtered[0] || list.sort((a,b)=>a.price-b.price)[0];
+    }
+
+    // Helper: Pick best CPU/GPU pair for performance within budget
+    function pickCpuGpu(budget, cpuBrand, gpuBrand) {
+      // Try to maximize sum of tiers, then performance (simple demo logic)
+      let cpuChoices = partsDB.cpus.filter(c => !cpuBrand || c.brand === cpuBrand);
+      let gpuChoices = partsDB.gpus.filter(g => !gpuBrand || g.brand === gpuBrand);
+
+      let best = null;
+      for (let cpu of cpuChoices) {
+        for (let gpu of gpuChoices) {
+          let price = cpu.price + gpu.price;
+          if (price > budget) continue;
+          let tierSum = cpu.tier + gpu.tier;
+          if (!best || tierSum > best.tierSum || (tierSum === best.tierSum && (cpu.price + gpu.price) > (best.cpu.price + best.gpu.price))) {
+            best = {cpu, gpu, tierSum};
+          }
+        }
+      }
+      // fallback to cheapest
+      if (!best) {
+        best = { cpu: cpuChoices[0] || partsDB.cpus[0], gpu: gpuChoices[0] || partsDB.gpus[0] };
+      }
+      return { cpu: best.cpu, gpu: best.gpu };
+    }
+
+    document.getElementById('configForm').onsubmit = function(e) {
+      e.preventDefault();
+      // Get all user input
+      const budget = Math.max(400, Math.min(4000, +document.getElementById('budget').value));
+      const cpuBrand = document.getElementById('cpuBrand').value;
+      const gpuBrand = document.getElementById('gpuBrand').value;
+      const moboBrand = document.getElementById('moboBrand').value;
+      const ramBrand = document.getElementById('ramBrand').value;
+      const storageBrand = document.getElementById('storageBrand').value;
+      const psuBrand = document.getElementById('psuBrand').value;
+      const caseBrand = document.getElementById('caseBrand').value;
+      const coolerType = document.getElementById('coolerType').value;
+
+      // Pick CPU+GPU first (largest performance impact)
+      let restBudget = budget - 350; // estimate rest of system
+      if (restBudget < 400) restBudget = budget * 0.65;
+
+      const {cpu, gpu} = pickCpuGpu(restBudget, cpuBrand, gpuBrand);
+
+      // Now pick other components
+      let remaining = budget - cpu.price - gpu.price;
+
+      const mobo = pickPart(partsDB.motherboards, moboBrand, remaining);
+      remaining -= mobo.price;
+      const ram = pickPart(partsDB.ram, ramBrand, remaining);
+      remaining -= ram.price;
+      const storage = pickPart(partsDB.storages, storageBrand, remaining);
+      remaining -= storage.price;
+      const psu = pickPart(partsDB.psus, psuBrand, remaining);
+      remaining -= psu.price;
+      const pcCase = pickPart(partsDB.cases, caseBrand, remaining);
+      remaining -= pcCase.price;
+      const cooler = pickPart(partsDB.coolers, null, remaining, coolerType);
+
+      // Compute total
+      const parts = [cpu, gpu, mobo, ram, storage, psu, pcCase, cooler];
+      const total = parts.reduce((s,p)=>s+(p?p.price:0), 0);
+
+      // Estimate FPS (average between CPU and GPU, "bottleneck" logic)
+      const games = ["Cyberpunk 2077", "Fortnite", "GTA V"];
+      let estFPS = {};
+      for (let game of games) {
+        let cpuFPS = cpu.performance?.[game] || 50;
+        let gpuFPS = gpu.performance?.[game] || 50;
+        estFPS[game] = Math.round(Math.min(cpuFPS, gpuFPS) * 0.96); // Slight system overhead
+      }
+
+      // Show result
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = `
+        <h2>Your PC Build</h2>
+        <ul class="parts-list">
+          <li><b>CPU:</b> ${cpu.brand} ${cpu.model} &mdash; $${cpu.price}</li>
+          <li><b>GPU:</b> ${gpu.brand} ${gpu.model} &mdash; $${gpu.price}</li>
+          <li><b>Motherboard:</b> ${mobo.brand} ${mobo.model} &mdash; $${mobo.price}</li>
+          <li><b>RAM:</b> ${ram.brand} ${ram.model} &mdash; $${ram.price}</li>
+          <li><b>Storage:</b> ${storage.brand} ${storage.model} &mdash; $${storage.price}</li>
+          <li><b>PSU:</b> ${psu.brand} ${psu.model} &mdash; $${psu.price}</li>
+          <li><b>Case:</b> ${pcCase.brand} ${pcCase.model} &mdash; $${pcCase.price}</li>
+          <li><b>CPU Cooler:</b> ${cooler.brand} ${cooler.model} &mdash; $${cooler.price}</li>
+        </ul>
+        <h3>Total Price: $${total}</h3>
+        <h3>Estimated Performance</h3>
+        <table class="fps-table">
+          <tr><th>Game</th><th>Approx. FPS (1080p High)</th></tr>
+          ${games.map(g=>`<tr><td>${g}</td><td>${estFPS[g]}</td></tr>`).join("")}
+        </table>
+      `;
+      resultDiv.style.display = 'block';
+      window.scrollTo({ top: resultDiv.offsetTop - 40, behavior: "smooth" });
+    };
+  </script>
+</body>
+</html>
