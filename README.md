@@ -5,7 +5,7 @@ A simple, free, beginner-friendly website to help you choose the best gaming PC 
 
 ## Features
 
-- Enter your budget (EUR)
+- Enter your budget (USD)
 - Set preferred brands for each part (or leave as "No Preference")
 - Choose CPU cooler type (Air or AIO)
 - Get a full parts list, total price, and estimated FPS in top games (demo values)
@@ -20,3 +20,4 @@ A simple, free, beginner-friendly website to help you choose the best gaming PC 
 
 ##DISCLAIMER
 - This is just a little project because I was bored. NONE of the given values about estimated performance are 100% accurate! This tool is meant to guide and help you configure your own PC. I am not responsible for any false purchases and potential disappointment in performance.
+- Prices are average values and subject to change. Therefore, use them as a form of guideline instead of a concrete and 100% correct value.
