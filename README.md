@@ -18,6 +18,6 @@ A simple, free, beginner-friendly website to help you choose the best gaming PC 
 3. Click "Configure My PC!"
 4. View your recommended build and estimated performance
 
-##DISCLAIMER
+## DISCLAIMER
 - This is just a little project because I was bored. NONE of the given values about estimated performance are 100% accurate! This tool is meant to guide and help you configure your own PC. I am not responsible for any false purchases and potential disappointment in performance.
 - Prices are average values and subject to change. Therefore, use them as a form of guideline instead of a concrete and 100% correct value.
